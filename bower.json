@@ -1,0 +1,11 @@
+{
+  "name": "openrov-plugin-rangefinder",
+  "description": "Laser range finder for OpenROV",
+  "version": "0.0.1",
+  "homepage": "",
+  "main": "public/js/rangefinder.js",
+  "keywords": [
+    "openrov",
+    "plugin"
+  ]
+}
