@@ -1,4 +1,4 @@
-This is a Laser calculation plugin for OpenROV Cockpit.
+This is a Laser range plugin for OpenROV Cockpit.
 
 NOTE! You must edit rangefinder.js to calibrate the laser range and camera centers
 
