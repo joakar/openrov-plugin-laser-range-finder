@@ -1,16 +1,15 @@
-This is the simpletheme plugin for OpenROV Cockpit.
+This is a Laser calculation plugin for OpenROV Cockpit.
 
-A new fresh theme for https://github.com/OpenROV/openrov-software<br>
-Tested with Release 2.5.1 (RC5)
+Tested with Release 2.5.1
 ###install
 
-* Drop openrov-simple-theme folder in ```/opt/openrov/cockpit/src/plugins```
+* Drop openrov-plugin-laser-range-finder folder in ```/opt/openrov/cockpit/src/plugins```
 * Restart OpenROV ```/etc/init.d/openrov restart```
-* You can enable/disable the theme in ```settings > Plugins to enable/disable > Simple Theme```
-* Enjoy!
+* You can enable/disable the plugin at ```settings > Plugins to enable/disable > Laser Range Finder```
+
+Because of cross origin policy in Chrome you need to disable websecurity by open Google Chrome with these args
+* OSX: ```open -a Google \ Chrome --- args -disable-web-security```
+* Windows: ```chrome.exe --disable-web-security```
+* Linux: ```google-chrome --disable-web-security```
 
 
-###screenshot
-![alt tag](http://i.imgur.com/nFQo0MQ.jpg)
-![alt tag](http://i.imgur.com/HKZ7VT5.png)
-![alt tag](http://i.cubeupload.com/En63zE.png)
