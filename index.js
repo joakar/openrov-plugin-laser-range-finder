@@ -1,5 +1,5 @@
-function simpletheme(name, deps) {
-    console.log("This is where plugin code for simpletheme loads in the node process.");
+function laserRange(name, deps) {
+    console.log("This is where plugin code for laserRange loads in the node process.");
 };
 
-module.exports = simpletheme;
+module.exports = laserRange;
