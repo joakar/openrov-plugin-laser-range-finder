@@ -11,7 +11,7 @@ Tested with Release 2.5.1
 * You can enable/disable the plugin at ```settings > Plugins to enable/disable > Laser Range Finder```
 
 Because of cross origin policy in Chrome you need to disable websecurity by open Google Chrome with these args
-* OSX: ```open -a Google \ Chrome --- args -disable-web-security```
+* OSX: ```open -a Google \ Chrome --args -disable-web-security```
 * Windows: ```chrome.exe --disable-web-security```
 * Linux: ```google-chrome --disable-web-security```
 
