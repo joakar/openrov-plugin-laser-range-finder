@@ -14,12 +14,18 @@
     //Setup parameters
 
     this.offset =  -0.00000;  //Camera offset to correct lenses
-    this.h_cm = 5.0; //Distance from camera center to laser
-    this.threshold = 10; //Color recognition threshold
+    this.h_cm = 6.0; //Distance from camera center to laser
+    this.threshold = 5; //Color recognition threshold
     this.DEBUG = false; //Debug mode
-    this.centerCorrectionX = 0; //Center Correction on laser
-    this.centerCorrectionY = 0; //Center Correction on laser
-    this.fps = 10; //How many frames it should be looking through a second
+    this.centerCorrectionX = -5; //Center Correction on laser
+    this.centerCorrectionY = 5; //Center Correction on laser
+    this.searchHeight = 10;
+
+    this.fps = 30; //How many frames it should be looking through a second
+
+
+    this.width = 640;
+    this.height = 320;
 
     //System variables
     this.canvas;
@@ -31,10 +37,12 @@
     this.range2;
     this.mainRefresh;
    
+    this.videoCanvas;
+    this.videoContext;
 
     this.enable = function () {
       var rov = this;
-      rov.canvas = jQuery('<canvas id="mastercanvas" style="position:absolute;top:150px;left:0;'+(rov.DEBUG?'':'display:none;')+'" width="640" height="20"></canvas>');
+      rov.canvas = jQuery('<canvas id="mastercanvas" style="position:absolute;top:150px;left:0;'+(rov.DEBUG?'':'display:none;')+'" width="'+rov.width+'" height="'+rov.searchHeight+'"></canvas>');
       jQuery('body').append(rov.canvas);
       rov.context = rov.canvas[0].getContext("2d");
       rov.img = document.getElementById('video');
@@ -43,9 +51,11 @@
       rov.lastPoint=[];
       rov.outOfRangeTime = [];
 
-      jQuery('#capestatus_footercontent').append('<div id="rangefinder" class="span2 pull-right" ><h2 id="rangeDetector1">0cm</h2><h2 id="rangeDetector2">0cm</h2></div>');
+      jQuery('#capestatus_footercontent').append('<div id="rangefinder" class="span2 pull-right" ><h2 id="rangeDetector1"></h2><h2 id="rangeDetector2"></h2></div>');
       rov.range1 = jQuery('#rangeDetector1');
       rov.range2 = jQuery('#rangeDetector2');
+      rov.videoCanvas = jQuery('#video-canvas');
+      rov.videoContext = rov.videoCanvas[0].getContext("2d");
       rov.mainRefresh = setInterval(rov.distanceCalculate, 1000 / rov.fps,rov);
     };
     this.disable = function () {
@@ -59,27 +69,48 @@
       rov.outOfRangeTime = undefined;
       rov.range1 = undefined;
       rov.range2 = undefined;
+      rov.videoCanvas = undefined;
+      rov.videoContext = undefined;
 
       jQuery('#rangefinder,#mastercanvas').remove();
     };
   };
 
   rangefinder.prototype.distanceCalculate = function(rov) {
-    rov.context.drawImage(rov.img, 0, -(170+rov.centerCorrectionY),640,360);
-    var point1 = rov.searchArea(0+rov.centerCorrectionX,0);
-    var point2 = rov.searchArea(320+rov.centerCorrectionX,0);
-    var cm1 = Math.floor(rov.h_cm / Math.tan(((-point1[0])-(-(320+rov.centerCorrectionX))) * 0.0024259339 + rov.offset));
-    var cm2 = Math.floor(rov.h_cm / Math.tan((point2[0]-(320+rov.centerCorrectionX)) * 0.0024259339 + rov.offset));
+  //  console.log(rov.height/2);
+   // rov.context.drawImage(rov.img, 0, -((rov.height/2)+rov.centerCorrectionY),rov.width,rov.searchHeight);
+    rov.context.drawImage(rov.img, 0, -(((rov.height/2)+rov.searchHeight/2)+rov.centerCorrectionY),rov.width,rov.height);
+  //  var point1 = rov.searchArea(0+rov.centerCorrectionX,0);
+    rov.context.beginPath();
+    rov.context.moveTo((rov.width/2)+rov.centerCorrectionX, 0);
+    rov.context.lineTo((rov.width/2)+rov.centerCorrectionX, rov.searchHeight);
+    rov.context.stroke();
+  
+  var point2 = rov.searchArea((rov.width/2)+rov.centerCorrectionX,0);
 
+ //   var cm1 = Math.floor(rov.h_cm / Math.tan(((-point1[0])-(-(320+rov.centerCorrectionX))) * 0.0024259339 + rov.offset));
+    var cm2 = Math.floor(rov.h_cm / Math.tan((point2[0]-((rov.width/2)+rov.centerCorrectionX)) * 0.0024259339 + rov.offset));
+/*
     var color = '#ffffff';
     if(point1[2] == 0) color = '#ff0000';
     rov.range1.html(rov.readablizeMetric(cm1)).css('color',color);
+*/
 
-    color = '#ffffff';
+
+    rov.drawArrow(rov,320+rov.centerCorrectionX+point2[0],170+rov.centerCorrectionY+point2[1]);
+
+    var color = '#ffffff';
     if(point2[2] == 0) color= '#ff0000';
-    rov.range2.html(rov.readablizeMetric(cm2)).css('color',color);
+    rov.range1.html(rov.readablizeMetric(cm2)).css('color',color);
   }
-
+  rangefinder.prototype.drawArrow = function(x,y) {
+    var rov = this;
+    rov.videoContext.beginPath();
+    rov.videoContext.arc(x, y, 75, 0, 2*Math.PI);
+    rov.videoContext.lineWidth = 2;
+    rov.videoContext.strokeStyle = 'red';
+    rov.videoContext.stroke();
+  }
   rangefinder.prototype.readablizeMetric = function(cm) {
     if(cm >= 100){
       return (cm/100).toFixed(1) + 'm';
@@ -92,8 +123,8 @@
 
   rangefinder.prototype.searchArea = function(xAre,yAre){
     var rov = this;
-    var imgData=rov.context.getImageData(xAre,yAre,320,20);
-    var imgDataOrg=rov.context.getImageData(xAre,yAre,320,20);
+    var imgData=rov.context.getImageData(xAre,yAre,(rov.width/2),rov.searchHeight);
+    var imgDataOrg=rov.context.getImageData(xAre,yAre,(rov.width/2),rov.searchHeight);
 
     var y = 0;
     var x = 0;
